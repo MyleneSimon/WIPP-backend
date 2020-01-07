@@ -14,7 +14,7 @@ package gov.nist.itl.ssd.wipp.backend.data.visualization.manifest.layers;
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.EntityLinks;
+import org.springframework.hateoas.server.EntityLinks;
 import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
@@ -41,7 +41,7 @@ public class BaseUrlManualRefSerializer extends JsonSerializer<String> {
 	public void serialize(String value, JsonGenerator gen, SerializerProvider sp)
 			throws IOException, JsonProcessingException {
 		if (value != null) {
-			Link link = entityLinks.linkToSingleResource(
+			Link link = entityLinks.linkToItemResource(
                     Pyramid.class,
                     value
             );
