@@ -12,16 +12,23 @@
 package gov.nist.itl.ssd.wipp.backend.data.csvCollection.csv;
 
 import gov.nist.itl.ssd.wipp.backend.core.CoreConfig;
+import gov.nist.itl.ssd.wipp.backend.core.model.data.DataDownloadToken;
+import gov.nist.itl.ssd.wipp.backend.core.model.data.DataDownloadTokenRepository;
+import gov.nist.itl.ssd.wipp.backend.core.rest.DownloadUrl;
 import gov.nist.itl.ssd.wipp.backend.core.rest.exception.ClientException;
+import gov.nist.itl.ssd.wipp.backend.core.rest.exception.ForbiddenException;
 import gov.nist.itl.ssd.wipp.backend.core.rest.exception.NotFoundException;
 import gov.nist.itl.ssd.wipp.backend.data.csvCollection.CsvCollection;
 import gov.nist.itl.ssd.wipp.backend.data.csvCollection.CsvCollectionRepository;
-
+import gov.nist.itl.ssd.wipp.backend.data.imagescollection.ImagesCollection;
+import gov.nist.itl.ssd.wipp.backend.data.imagescollection.images.ImageController;
 import io.swagger.annotations.Api;
 
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.*;
@@ -34,9 +41,19 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Optional;
+
+import javax.servlet.http.HttpServletResponse;
 
 /**
  *
@@ -60,6 +77,9 @@ public class CsvController {
 
     @Autowired
     private CsvHandler csvHandler;
+    
+    @Autowired
+    private DataDownloadTokenRepository dataDownloadTokenRepository;
 
     @RequestMapping(value = "", method = RequestMethod.GET)
     @PreAuthorize("hasRole('admin') or @csvCollectionSecurity.checkAuthorize(#csvCollectionId, false)")
@@ -74,6 +94,59 @@ public class CsvController {
         resources.forEach(
                 resource -> processResource(csvCollectionId, resource));
         return new ResponseEntity<>(resources, HttpStatus.OK);
+    }
+    
+    @RequestMapping(
+            value = "/{fileName:.+}/request",
+            method = RequestMethod.GET,
+            produces = "application/json")
+    @PreAuthorize("hasRole('admin') or @csvCollectionSecurity.checkAuthorize(#csvCollectionId, false)")
+    public DownloadUrl requestFileDownload(
+            @PathVariable("csvCollectionId") String csvCollectionId,
+            @PathVariable("fileName") String fileName) {
+        // Generate and send unique download URL
+        String tokenParam = generateDownloadTokenParam(csvCollectionId);
+        String filePath = "/" + fileName;
+        String downloadLink = linkTo(CsvController.class,
+        		csvCollectionId).toString() + filePath + tokenParam;
+        return new DownloadUrl(downloadLink);
+    }
+
+    @RequestMapping(value = "/{fileName:.+}", method = RequestMethod.HEAD)
+    public void headFile(
+            @PathVariable("csvCollectionId") String csvCollectionId,
+            @PathVariable("fileName") String fileName,
+            @RequestParam("token") String token,
+            HttpServletResponse response) throws IOException {
+    	// Check validity of download token
+    	checkDownloadTokenValidity(token, csvCollectionId);
+    	// Check existence of file and send length
+        File file = csvHandler.getFile(csvCollectionId, fileName);
+        if (!file.exists()) {
+            throw new NotFoundException("File does not exist.");
+        }
+        response.setContentLengthLong(file.length());
+    }
+
+    @RequestMapping(value = "/{fileName:.+}", method = RequestMethod.GET)
+    public void getFile(
+            @PathVariable("csvCollectionId") String csvCollectionId,
+            @PathVariable("fileName") String fileName,
+            @RequestParam("token") String token,
+            HttpServletResponse response) throws IOException {
+    	// Check validity of download token
+    	checkDownloadTokenValidity(token, csvCollectionId);
+    	// Send file
+        File file = csvHandler.getFile(csvCollectionId, fileName);
+        response.setContentLengthLong(file.length());
+        response.setHeader("Content-disposition",
+                "attachment;filename=" + fileName);
+        try (InputStream fis = new FileInputStream(file)) {
+            IOUtils.copyLarge(fis, response.getOutputStream());
+            response.flushBuffer();
+        } catch (FileNotFoundException ex) {
+            throw new NotFoundException("File does not exist.", ex);
+        }
     }
 
     @RequestMapping(value = "", method = RequestMethod.DELETE)
@@ -118,6 +191,32 @@ public class CsvController {
                 .slash(file.getFileName())
                 .withSelfRel();
         resource.add(link);
+    }
+    
+    private void checkDownloadTokenValidity(String token, String csvCollectionId) {
+    	Optional<DataDownloadToken> downloadToken = dataDownloadTokenRepository.findByToken(token);
+    	if (!downloadToken.isPresent() || !downloadToken.get().getDataId().equals(csvCollectionId)) {
+    		throw new ForbiddenException("Invalid download token.");
+    	}
+    }
+    
+    private String generateDownloadTokenParam(String csvCollectionId) {
+    	// Check existence of CSV collection
+    	Optional<CsvCollection> coll = csvCollectionRepository.findById(
+    			csvCollectionId);
+        if (!coll.isPresent()) {
+            throw new ResourceNotFoundException(
+                    "CSV collection " + csvCollectionId + " not found.");
+        }
+        
+        // Generate download token
+        DataDownloadToken downloadToken = new DataDownloadToken(csvCollectionId);
+        dataDownloadTokenRepository.save(downloadToken);
+        
+        // Generate token param
+        String tokenParam = "?token=" + downloadToken.getToken();
+        
+        return tokenParam;
     }
 
 }
