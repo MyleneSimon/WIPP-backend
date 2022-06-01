@@ -99,19 +99,29 @@ public class ImagesCollection extends Data {
     }
 
     public ImagesCollection(Job job, String outputName) {
+    	this(job, outputName, ImagesCollectionFormat.OMETIFF);
+    }
+    
+    public ImagesCollection(Job job, String outputName, ImagesCollectionFormat format) {
         this.name = job.getName() + "-" + outputName;
         this.sourceJob = job.getId();
         this.locked = true;
         this.creationDate = new Date();
         this.importMethod = ImagesCollectionImportMethod.JOB;
+        this.format = format;
     }
     
     public ImagesCollection(String name, String sourceCatalog){
+    	this(name, sourceCatalog, ImagesCollectionFormat.OMETIFF);
+    }
+    
+    public ImagesCollection(String name, String sourceCatalog, ImagesCollectionFormat format){
         this.name = name;
         this.locked = true;
         this.creationDate = new Date();	
         this.sourceCatalog = sourceCatalog;
         this.importMethod = ImagesCollectionImportMethod.CATALOG;
+        this.format = format;
     }
 
     public String getId() {
