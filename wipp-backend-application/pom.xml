@@ -131,6 +131,11 @@
 			<artifactId>wipp-backend-argo-workflows</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>gov.nist.itl.ssd.wipp</groupId>
+			<artifactId>wipp-backend-cwl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

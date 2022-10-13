@@ -10,6 +10,7 @@
         <module>wipp-backend-data</module>
         <module>wipp-backend-application</module>
         <module>wipp-backend-argo-workflows</module>
+        <module>wipp-backend-cwl</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
