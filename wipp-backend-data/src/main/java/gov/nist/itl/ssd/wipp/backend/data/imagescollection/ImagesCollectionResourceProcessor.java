@@ -66,6 +66,11 @@ public class ImagesCollectionResourceProcessor
                 .withRel("copy");
         resource.add(copyLink);
 
+        Link annotateLink = linkTo(ImagesCollectionAnnotationController.class,
+                imagesCollection.getId())
+                .withRel("annotate");
+        resource.add(annotateLink);
+
         return resource;
     }
 

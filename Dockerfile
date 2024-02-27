@@ -1,4 +1,5 @@
-FROM openjdk:8-jdk-alpine
+FROM eclipse-temurin:8-jdk-alpine
+
 MAINTAINER National Institute of Standards and Technology
 
 EXPOSE 8080
@@ -23,6 +24,13 @@ RUN wget https://repo1.maven.org/maven2/co/elastic/apm/elastic-apm-agent/${APM_V
 RUN wget https://github.com/argoproj/argo-workflows/releases/download/${ARGO_VERSION}/argo-linux-amd64 && \
     chmod +x argo-linux-amd64 && \
     mv argo-linux-amd64 /usr/local/bin/argo
+
+# Install Python and dependencies
+RUN apk update
+RUN apk add --no-cache --update python3 python3-dev py3-pip gcc g++ make linux-headers
+RUN pip3 install --break-system-packages --upgrade pip
+RUN pip3 install --break-system-packages cvat-sdk pymongo regex opencv-python-headless
+RUN pip3 install --break-system-packages pycocotools potracer
 
 # Copy WIPP backend application exec WAR
 COPY ${BACKEND_NAME}/target/${BACKEND_NAME}-*-exec.war ${EXEC_DIR}/wipp-backend.war

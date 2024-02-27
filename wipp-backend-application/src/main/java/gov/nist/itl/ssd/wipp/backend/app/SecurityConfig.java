@@ -110,5 +110,7 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter
     @Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring().antMatchers(HttpMethod.POST, CoreConfig.BASE_URI + "/workflows/{workflowId}/exit");
+        web.ignoring().antMatchers(HttpMethod.POST, CoreConfig.BASE_URI + "/cvatWebhookReceiver");
+
     }
 }
