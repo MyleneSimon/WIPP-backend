@@ -64,9 +64,13 @@ public class WorkflowConverter {
 
     private List<ArgoVolume> generateSpecVolumes() {
         ArrayList<ArgoVolume> argoVolumeList = new ArrayList<>();
-        ArgoVolume inputArgoVolume = new ArgoVolume(wippDataVolumeName, 
+        ArgoPVCVolume inputArgoVolume = new ArgoPVCVolume(wippDataVolumeName,
 				coreConfig.getWippDataPVCName());
         argoVolumeList.add(inputArgoVolume);
+        // add shared memory volume
+        ArgoEmptyDirVolume shmArgoVolume = new ArgoEmptyDirVolume("dshm",
+                "Memory");
+        argoVolumeList.add(shmArgoVolume);
 
         return argoVolumeList;
     }
@@ -108,6 +112,14 @@ public class WorkflowConverter {
         outputDataVolumeMount.put("subPath", getOutputMountSubPath(jobId));
         outputDataVolumeMount.put("readOnly", false);
         volumeMounts.add(outputDataVolumeMount);
+        //container.setVolumeMounts(volumeMounts);
+
+        // Setup the volume mount for the shared memory
+        HashMap<String, Object> sharedMemoryVolumeMount = new HashMap<>();
+        sharedMemoryVolumeMount.put("mountPath", "/dev/shm");
+        sharedMemoryVolumeMount.put("name", "dshm");
+        volumeMounts.add(sharedMemoryVolumeMount);
+
         container.setVolumeMounts(volumeMounts);
 
         // Add resource requirements if any
