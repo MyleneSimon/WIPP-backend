@@ -13,12 +13,16 @@ package gov.nist.itl.ssd.wipp.backend.data.imagescollection;
 
 import gov.nist.itl.ssd.wipp.backend.core.model.auth.PrincipalFilteredRepository;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+import org.springframework.data.rest.core.annotation.RestResource;
 
+@Tag(name="ImagesCollection Entity")
 @RepositoryRestResource
 public interface ImagesCollectionRepository
         extends PrincipalFilteredRepository<ImagesCollection, String>,
@@ -29,7 +33,7 @@ public interface ImagesCollectionRepository
 	 */
 	@Query(" { '$and' : ["
 			+ "{'$or':["
-			+ "{'owner': ?#{ hasRole('admin') ? {$exists:true} : (hasRole('ANONYMOUS') ? '':principal.name)}},"
+			+ "{'owner': ?#{ hasRole('admin') ? {$exists:true} : (hasRole('ANONYMOUS') ? '':authentication.name)}},"
 			+ "{'publiclyShared':true}"
 			+ "]} , "
 			+ "{'name' : {$eq : ?0}}"
@@ -41,7 +45,7 @@ public interface ImagesCollectionRepository
 	 */
 	@Query(" { '$and' : ["
     		+ "{'$or':["
-    		+ "{'owner': ?#{ hasRole('admin') ? {$exists:true} : (hasRole('ANONYMOUS') ? '':principal.name)}},"
+    		+ "{'owner': ?#{ hasRole('admin') ? {$exists:true} : (hasRole('ANONYMOUS') ? '':authentication.name)}},"
     		+ "	{'publiclyShared':true}"
     		+ "]} , "
     		+ "{'name' : {$regex : '?0', $options: 'i'}}, {'numberOfImages' : {$eq : ?1}}"
@@ -52,6 +56,7 @@ public interface ImagesCollectionRepository
             Pageable p);
 
     // Not exported
+    @RestResource(exported = false)
     long countByName(@Param("name") String name);
 
 }

@@ -15,14 +15,6 @@ if [[ -z $KEYCLOAK_AUTH_URL ]]; then
   exit 1
 fi
 
-if [[ -z $KEYCLOAK_SSL_REQUIRED ]]; then
-  KEYCLOAK_SSL_REQUIRED="external"
-fi
-
-if [[ -z $KEYCLOAK_DISABLE_TRUST_MANAGER ]]; then
-  KEYCLOAK_DISABLE_TRUST_MANAGER="false"
-fi
-
 if [[ -z $OME_CONVERTER_THREADS ]]; then
   OME_CONVERTER_THREADS="6"
 fi
@@ -32,8 +24,6 @@ sed -i \
   -e 's/@mongo_port@/'"${MONGO_PORT}"'/' \
   -e 's/@shared_pvc@/'"${SHARED_PVC}"'/' \
   -e 's|@keycloak_auth_url@|'"${KEYCLOAK_AUTH_URL}"'|' \
-  -e 's|@keycloak_ssl_required@|'"${KEYCLOAK_SSL_REQUIRED}"'|' \
-  -e 's|@keycloak_disable_trust_manager@|'"${KEYCLOAK_DISABLE_TRUST_MANAGER}"'|' \
   -e 's|@workflow_nodeSelector@|'"${NODE_SELECTOR}"'|' \
   -e 's|@workflow_tolerations@|'"${TOLERATIONS}"'|' \
   -e 's|@ome_converter_threads@|'"${OME_CONVERTER_THREADS}"'|' \
@@ -45,5 +35,7 @@ if [[ -n ${ELASTIC_APM_SERVER_URLS} && -n ${ELASTIC_APM_SERVICE_NAME} ]]; then
   export JAVA_TOOL_OPTIONS="$JAVA_TOOL_OPTIONS -Delastic.apm.application_packages=$ELASTIC_APM_APPLICATION_PACKAGES"
   export JAVA_TOOL_OPTIONS="$JAVA_TOOL_OPTIONS -Delastic.apm.server_urls=$ELASTIC_APM_SERVER_URLS"
 fi
+
+keytool -importcert -file /etc/ssl/certs/tls.crt -noprompt -alias certificate_alias -storepass changeit -keystore $JAVA_HOME/lib/security/cacerts
 
 java -jar /opt/wipp/wipp-backend.war

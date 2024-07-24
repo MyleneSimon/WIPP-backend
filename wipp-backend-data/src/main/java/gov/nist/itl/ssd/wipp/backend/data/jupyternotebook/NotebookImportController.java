@@ -14,8 +14,10 @@ package gov.nist.itl.ssd.wipp.backend.data.jupyternotebook;
 import java.io.File;
 import java.io.IOException;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,14 +25,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import gov.nist.itl.ssd.wipp.backend.core.CoreConfig;
 import gov.nist.itl.ssd.wipp.backend.core.rest.exception.ClientException;
-import io.swagger.annotations.Api;
 
 /**
 *
 * @author Mohamed Ouladi <mohamed.ouladi at nist.gov>
 */
 @RestController
-@Api(tags="Notebook Entity")
+@Tag(name="Notebook Entity")
 @RequestMapping(CoreConfig.BASE_URI + "/notebooks/import")
 public class NotebookImportController {
 
@@ -59,6 +60,7 @@ public class NotebookImportController {
         }
         
         Notebook notebook = new Notebook(name, description);
+        notebook.setOwner(SecurityContextHolder.getContext().getAuthentication().getName());
         notebook = notebookRepository.save(notebook);
         
         // Notebook temp folder
