@@ -9,7 +9,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * LabelsSummary
  */
 
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2024-01-22T10:53:14.701528-05:00[America/New_York]")
+@jakarta.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2024-01-22T10:53:14.701528-05:00[America/New_York]")
 
 
 public class LabelsSummary   {
