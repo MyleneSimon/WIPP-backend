@@ -19,6 +19,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestClient;
 
 import java.io.File;
+import java.time.Duration;
 import java.util.List;
 
 /**
@@ -86,7 +88,12 @@ public class ImageAnnotationsTaskWebhookReceiver {
         }
 
         // Request download
-        RestClient restClient = RestClient.create();
+        SimpleClientHttpRequestFactory simpleClientHttpRequestFactory = new SimpleClientHttpRequestFactory();
+        simpleClientHttpRequestFactory.setConnectTimeout(Duration.ofSeconds(20));
+        simpleClientHttpRequestFactory.setReadTimeout(0);
+        RestClient restClient = RestClient.builder()
+                .requestFactory(simpleClientHttpRequestFactory)
+                .build();
         AnnotationsDownloadRequestBody annotationsDownloadRequestBody = new AnnotationsDownloadRequestBody();
         annotationsDownloadRequestBody.setTask_id(Integer.parseInt(taskId));
         annotationsDownloadRequestBody.setFormat(new String[]{"datumaro", "svg", "mask"});
