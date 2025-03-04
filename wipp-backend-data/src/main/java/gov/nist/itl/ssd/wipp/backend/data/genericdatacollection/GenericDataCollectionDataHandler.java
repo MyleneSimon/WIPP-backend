@@ -58,7 +58,6 @@ public class GenericDataCollectionDataHandler extends BaseDataHandler implements
 		genericDataCollectionRepository.save(genericDataCollection);
 
 		File genericDataCollectionFolder = new File(config.getGenericDataCollectionsFolder(), genericDataCollection.getId());
-		genericDataCollectionFolder.mkdirs();
 
 		try {
 			File tempOutputDir = getJobOutputTempFolder(job.getId(), outputName);
