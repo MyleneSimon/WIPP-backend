@@ -3,12 +3,14 @@ package gov.nist.itl.ssd.wipp.backend.data.imageannotations;
 import gov.nist.itl.ssd.wipp.backend.core.model.job.Job;
 import gov.nist.itl.ssd.wipp.backend.core.rest.annotation.IdExposed;
 import gov.nist.itl.ssd.wipp.backend.core.rest.annotation.ManualRef;
+import gov.nist.itl.ssd.wipp.backend.data.iterativeai.IterativeTrainingPipeline;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
+import java.util.List;
 
 @IdExposed
 @Document
@@ -35,6 +37,8 @@ public class ImageAnnotationsCollection {
     private String targetMaskCollectionId;
 
     private String taskId;
+
+    private List<AnnotationColorLabel> labels;
 
     private boolean publiclyShared;
 
@@ -101,6 +105,14 @@ public class ImageAnnotationsCollection {
 
     public void setTaskId(String taskId) {
         this.taskId = taskId;
+    }
+
+    public List<AnnotationColorLabel> getLabels() {
+        return labels;
+    }
+
+    public void setLabels(List<AnnotationColorLabel> labels) {
+        this.labels = labels;
     }
 
     public boolean isPubliclyShared() {

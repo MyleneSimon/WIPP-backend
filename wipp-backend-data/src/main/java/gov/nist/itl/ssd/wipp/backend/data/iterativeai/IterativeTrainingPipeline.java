@@ -12,6 +12,7 @@
 package gov.nist.itl.ssd.wipp.backend.data.iterativeai;
 
 import gov.nist.itl.ssd.wipp.backend.core.rest.annotation.IdExposed;
+import gov.nist.itl.ssd.wipp.backend.data.imageannotations.AnnotationColorLabel;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -210,29 +211,29 @@ public class IterativeTrainingPipeline {
         }
     }
 
-    public static class AnnotationColorLabel {
-
-        String name;
-        String color;
-
-        AnnotationColorLabel() {}
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public String getColor() {
-            return color;
-        }
-
-        public void setColor(String color) {
-            this.color = color;
-        }
-    }
+//    public static class AnnotationColorLabel {
+//
+//        String name;
+//        String color;
+//
+//        AnnotationColorLabel() {}
+//
+//        public String getName() {
+//            return name;
+//        }
+//
+//        public void setName(String name) {
+//            this.name = name;
+//        }
+//
+//        public String getColor() {
+//            return color;
+//        }
+//
+//        public void setColor(String color) {
+//            this.color = color;
+//        }
+//    }
 
     public enum TaskCategory { SEGMENTATION, CLASSIFICATION }
 

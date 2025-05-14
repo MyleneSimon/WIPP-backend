@@ -138,7 +138,7 @@ public class WorkflowExitController {
                     }
                 } catch (Exception e) {
                     job.setStatus(JobStatus.ERROR);
-                    job.setError("Unable to import job result");
+                    job.setError("Unable to import job result " + e.toString());
                 }
             } else {
                 job.setError(errorMessage);
