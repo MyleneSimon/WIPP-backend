@@ -29,6 +29,10 @@
 			<id>bioformats2raw2ometiff</id>
 			<url>https://repo.glencoesoftware.com/repository/bioformats2raw2ometiff</url>
 		</repository>
+		<repository>
+			<id>unidata-releases</id>
+			<url>https://artifacts.glencoesoftware.com/artifactory/unidata-releases</url>
+		</repository>
 	</repositories>
 
 	<dependencies>
