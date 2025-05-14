@@ -11,6 +11,9 @@
  */
 package gov.nist.itl.ssd.wipp.backend.core.model.computation;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.util.Map;
 
 /**
@@ -22,6 +25,7 @@ public class PluginIO {
     private String description;
     private String type;
     // The options field contains any objects and is parsed by the UI
+    @Schema(additionalProperties = Schema.AdditionalPropertiesValue.TRUE)
     private Map<String, Object> options;
     private boolean required = true;
 
