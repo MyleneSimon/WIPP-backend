@@ -59,8 +59,8 @@ import gov.nist.itl.ssd.wipp.backend.core.model.job.JobExecutionException;
  * @author Mylene Simon <mylene.simon at nist.gov>
  * @author Antoine Meyer <antoine.meyer at nist.gov>
  */
-@Component("aiModelDataHandler")
-@Qualifier("tensorflowModelDataHandler")
+@Component("tensorflowModelDataHandler")
+//@Qualifier("tensorflowModelDataHandler")
 public class AiModelDataHandler extends BaseDataHandler implements DataHandler {
 
 	@Autowired
@@ -133,7 +133,8 @@ public class AiModelDataHandler extends BaseDataHandler implements DataHandler {
             }
         }
         // get framework data from this output
-        if(outputDir!=null && !outputDir.getOptions().isEmpty()) {
+        if(outputDir!=null && outputDir.getOptions()!=null && !outputDir.getOptions().isEmpty() &&
+                outputDir.getOptions().get("framework")!=null) {
             aiModel.setFramework(outputDir.getOptions().get("framework").toString());
         } else {
             aiModel.setFramework("N/A");
@@ -194,6 +195,8 @@ public class AiModelDataHandler extends BaseDataHandler implements DataHandler {
 
     @Override
     public String exportDataAsParam(String value) {
+        System.out.println("export param");
+        System.out.println(value);
         String aiModelId = value;
         String aiModelPath;
 
@@ -213,6 +216,7 @@ public class AiModelDataHandler extends BaseDataHandler implements DataHandler {
 
         }
         aiModelPath = aiModelPath.replaceFirst(config.getStorageRootFolder(),config.getContainerInputsMountPath());
+        System.out.println(aiModelPath);
         return aiModelPath;
 
     }

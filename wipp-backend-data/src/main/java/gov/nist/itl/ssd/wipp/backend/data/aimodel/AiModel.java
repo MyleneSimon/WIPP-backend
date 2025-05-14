@@ -46,7 +46,7 @@ import gov.nist.itl.ssd.wipp.backend.core.rest.annotation.ManualRef;
  * @author Mohamed Ouladi <mohamed.ouladi at nist.gov>
  */
 @IdExposed
-@Document
+@Document("tensorflowModel")
 public class AiModel extends Data {
 	@Id
 	private String id;
