@@ -108,6 +108,7 @@ public class WIPPUnetTemplate {
         } else {
             // Copy workflow from previous iteration if not first iteration
             workflow = workflowCopyService.copy(previousIteration.getTrainingWorkflow(), iterationName,
+                    "Iterative AI pipeline " + pipeline.getName() + " iteration " + newIterationNumber,
                     pipeline.getOwner(), WorkflowStatus.PENDING);
         }
         return workflow;

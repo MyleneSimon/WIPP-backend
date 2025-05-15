@@ -20,6 +20,8 @@ public class Workflow {
 
     private String owner;
 
+    private String description;
+
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private Date creationDate;
 
@@ -167,4 +169,12 @@ public class Workflow {
 	public void setPubliclyShared(boolean publiclyShared) {
 		this.publiclyShared = publiclyShared;
 	}
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 }

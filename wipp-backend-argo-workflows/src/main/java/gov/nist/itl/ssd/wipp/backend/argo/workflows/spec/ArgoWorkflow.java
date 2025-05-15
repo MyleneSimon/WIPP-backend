@@ -11,7 +11,7 @@ import java.util.Map;
 public class ArgoWorkflow {
     private final String apiVersion = "argoproj.io/v1alpha1";
     private final String kind = "Workflow";
-    private Map<String, String> metadata;
+    private Map<String, Object> metadata;
     private ArgoWorkflowSpec spec;
 
     public String getApiVersion() {
@@ -23,11 +23,11 @@ public class ArgoWorkflow {
     }
 
 
-    public Map<String, String> getMetadata() {
+    public Map<String, Object> getMetadata() {
         return metadata;
     }
 
-    public void setMetadata(Map<String, String> metadata) {
+    public void setMetadata(Map<String, Object> metadata) {
         this.metadata = metadata;
     }
 

@@ -43,9 +43,9 @@ public class WorkflowCopyController
             method = RequestMethod.POST)  
     public EntityModel<Workflow> copy(
             @PathVariable("workflowId") String workflowId,
-            @RequestBody String workflowName) {
+            @RequestBody WorkflowCopyInfo workflowCopyInfo) {
     	
-    	if (workflowName == null) {
+    	if (workflowCopyInfo == null || workflowCopyInfo.getName() == null) {
             throw new ClientException(
                     "A name for the new workflow must be provided.");
         }
@@ -54,11 +54,35 @@ public class WorkflowCopyController
             // Set the owner to the connected user
             String copyWorkflowOwner = SecurityContextHolder.getContext().getAuthentication().getName();
             // Copy workflow
-            Workflow copy = workflowCopyService.copy(workflowId, workflowName, copyWorkflowOwner, WorkflowStatus.CREATED);
+            Workflow copy = workflowCopyService.copy(workflowId, workflowCopyInfo.getName(), workflowCopyInfo.getDescription(),
+                    copyWorkflowOwner, WorkflowStatus.CREATED);
             return EntityModel.of(copy);
 
         } catch (Exception e) {
             throw new ClientException("Error while copying workflow" + e);
+        }
+    }
+
+    public static class WorkflowCopyInfo {
+        private String name;
+        private String description;
+
+        public WorkflowCopyInfo() {}
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public void setDescription(String description) {
+            this.description = description;
         }
     }
 

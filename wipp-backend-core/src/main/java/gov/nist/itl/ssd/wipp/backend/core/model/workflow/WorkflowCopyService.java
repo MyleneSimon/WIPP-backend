@@ -45,7 +45,7 @@ public class WorkflowCopyService {
     @Autowired
     private WorkflowLogic workflowLogic;
 
-    public Workflow copy(String workflowId, String workflowName, String owner, WorkflowStatus status) {
+    public Workflow copy(String workflowId, String workflowName, String workflowDescription, String owner, WorkflowStatus status) {
 
         workflowLogic.assertWorkflowNameUnique(workflowName);
 
@@ -60,6 +60,7 @@ public class WorkflowCopyService {
 
         // Create the copied workflow
         Workflow copy = new Workflow(workflowName);
+        copy.setDescription(workflowDescription);
         copy.setStatus(status);
         // Set the owner to the connected/selected user
         copy.setOwner(owner);

@@ -27,6 +27,7 @@ import gov.nist.itl.ssd.wipp.backend.core.model.data.DataHandler;
 import gov.nist.itl.ssd.wipp.backend.core.model.data.DataHandlerService;
 import gov.nist.itl.ssd.wipp.backend.core.model.job.Job;
 import gov.nist.itl.ssd.wipp.backend.core.model.workflow.Workflow;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.stereotype.Component;
@@ -60,10 +61,14 @@ public class WorkflowConverter {
     private DataHandlerService dataHandlerService;
 
 
-    private HashMap<String, String> generateMetadata() {
-        HashMap<String, String> metadata = new HashMap<>();
+    private HashMap<String, Object> generateMetadata() {
+        HashMap<String, Object> metadata = new HashMap<>();
         metadata.put("generateName", this.workflow.getName().toLowerCase() + "-");
-
+        HashMap<String, String> annotations = new HashMap<>();
+        annotations.put("workflows.argoproj.io/title", workflow.getName());
+        if(StringUtils.isNotBlank(workflow.getDescription()))
+            annotations.put("workflows.argoproj.io/description", workflow.getDescription());
+        metadata.put("annotations", annotations);
         return metadata;
     }
 
