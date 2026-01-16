@@ -47,6 +47,8 @@ public class Image {
 
     private String originalFileName;
 
+    private String originalFilePath;
+
     private long fileSize;
 
     private boolean importing;
@@ -58,14 +60,20 @@ public class Image {
 
     public Image(String imagesCollection, String fileName, String originalFileName, long fileSize,
             boolean isImporting) {
-        this(imagesCollection, fileName, originalFileName, fileSize, isImporting, null);
+        this(imagesCollection, fileName, originalFileName, null, fileSize, isImporting, null);
     }
 
-    public Image(String imagesCollection, String fileName, String originalFileName, long fileSize,
+    public Image(String imagesCollection, String fileName, String originalFileName, String originalFilePath, long fileSize,
+                 boolean isImporting) {
+        this(imagesCollection, fileName, originalFileName, originalFilePath, fileSize, isImporting, null);
+    }
+
+    public Image(String imagesCollection, String fileName, String originalFileName, String originalFilePath, long fileSize,
             boolean isImporting, String importError) {
         this.imagesCollection = imagesCollection;
         this.fileName = fileName;
         this.originalFileName = originalFileName;
+        this.originalFilePath = originalFilePath;
         this.fileSize = fileSize;
         this.importing = isImporting;
         this.importError = importError;
@@ -88,6 +96,10 @@ public class Image {
 		return originalFileName;
 	}
 
+    public String getOriginalFilePath() {
+        return originalFilePath;
+    }
+
 	public long getFileSize() {
         return fileSize;
     }
@@ -99,6 +111,10 @@ public class Image {
     public void setOriginalFileName(String originalFileName) {
 		this.originalFileName = originalFileName;
 	}
+
+    public void setOriginalFilePath(String originalFilePath) {
+        this.originalFilePath = originalFilePath;
+    }
 
 	public void setFileSize(long fileSize) {
         this.fileSize = fileSize;

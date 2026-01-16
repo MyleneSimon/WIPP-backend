@@ -58,6 +58,8 @@ public class ImagesCollection extends Data {
     @ManualRef(ImageAnnotationsCollection.class)
     private String sourceAnnotationCollection;
 
+    private String dataPid;
+
     private ImagesCollectionImportMethod importMethod;
 
     private ImagesCollectionFormat format;
@@ -239,8 +241,12 @@ public class ImagesCollection extends Data {
     public void setFormat(ImagesCollectionFormat format) {
         this.format = format;
     }
+
+    public String getDataPid() { return dataPid; }
+
+    public void setDataPid(String dataPid) { this.dataPid = dataPid; }
 	
-    public enum ImagesCollectionImportMethod {UPLOADED, JOB, CATALOG, BACKEND_IMPORT, ANNOT}
+    public enum ImagesCollectionImportMethod {UPLOADED, JOB, CATALOG, BACKEND_IMPORT, ANNOT, NEXUSLIMS}
 
     public enum ImagesCollectionFormat {OMETIFF, OMEZARR, RAW}
 

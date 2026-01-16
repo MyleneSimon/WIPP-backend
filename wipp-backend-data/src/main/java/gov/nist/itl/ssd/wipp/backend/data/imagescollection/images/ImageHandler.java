@@ -68,6 +68,15 @@ public class ImageHandler extends FileHandler {
         return this.addAllInDbFromFiles(imagesCollectionId, files, true);
     }
 
+    public List<Image> addAllInDbFromFolderAndRelativePaths(String imagesCollectionId, String path, List<String> relativePaths) {
+        //File[] files = new File(path).listFiles(f -> (f.isFile() && !f.isHidden()));
+        File[] files = relativePaths.stream()
+                .map(relativePath -> new File(path, relativePath))
+                .filter(file -> file.isFile() && !file.isHidden())
+                .toArray(File[]::new);
+        return this.addAllInDbFromFiles(imagesCollectionId, files, true);
+    }
+
     private List<Image> addAllInDbFromFiles(String imagesCollectionId, File[] files, boolean setImporting) {
         if (files == null) {
             return new ArrayList<>();
