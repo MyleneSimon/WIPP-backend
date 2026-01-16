@@ -21,11 +21,7 @@ import java.util.logging.Logger;
 
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.rest.core.annotation.HandleAfterDelete;
-import org.springframework.data.rest.core.annotation.HandleBeforeCreate;
-import org.springframework.data.rest.core.annotation.HandleBeforeDelete;
-import org.springframework.data.rest.core.annotation.HandleBeforeSave;
-import org.springframework.data.rest.core.annotation.RepositoryEventHandler;
+import org.springframework.data.rest.core.annotation.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -58,7 +54,8 @@ public class GenericDataCollectionEventHandler {
     @Autowired
     private GenericDataCollectionLogic genericDataCollectionLogic;
 
-
+    @Autowired
+    private GenericDataCollectionLocalImporter localImporter;
 
     @PreAuthorize("isAuthenticated()")
     @HandleBeforeCreate
@@ -74,6 +71,13 @@ public class GenericDataCollectionEventHandler {
         // Set the owner to the connected user
     	genericDataCollection.setOwner(SecurityContextHolder.getContext().getAuthentication().getName());
 
+    }
+
+    @HandleAfterCreate
+    public void handleAfterCreate(GenericDataCollection genericDataCollection) {
+        if(genericDataCollection.getImportMethod().equals(GenericDataCollection.GenericDataCollectionImportMethod.BACKEND_IMPORT)) {
+            localImporter.importFromLocalFolder(genericDataCollection);
+        }
     }
 
     @HandleBeforeSave

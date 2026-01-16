@@ -66,6 +66,10 @@ public class GenericDataCollection {
 	@Indexed(unique = true, sparse = true)
 	@ManualRef(Job.class)
 	private String sourceJob;
+
+	private String sourceBackendImport;
+
+	private GenericDataCollectionImportMethod importMethod;
 	
     private boolean publiclyShared;
 	
@@ -80,18 +84,21 @@ public class GenericDataCollection {
 		this.name = name;
 		this.creationDate = new Date();
 		this.locked = locked;
+		this.importMethod = GenericDataCollectionImportMethod.UPLOADED;
 	}
 
 	public GenericDataCollection(Job job){
 		this.name = job.getName();
 		this.sourceJob = job.getId();
 		this.creationDate = new Date();
+		this.importMethod = GenericDataCollectionImportMethod.JOB;
 	}
 
 	public GenericDataCollection(Job job, String outputName) {
 		this.name = job.getName() + "-" + outputName;
 		this.sourceJob = job.getId();
 		this.creationDate = new Date();
+		this.importMethod = GenericDataCollectionImportMethod.JOB;
 	}
 
 	public String getId() {
@@ -175,5 +182,15 @@ public class GenericDataCollection {
 	public int getNumberImportingGenericFiles() {
 		return numberImportingGenericFiles;
 	}
+
+    public GenericDataCollectionImportMethod getImportMethod() { return importMethod; }
+
+    public void setImportMethod(GenericDataCollectionImportMethod importMethod) { this.importMethod = importMethod; }
+
+    public String getSourceBackendImport() { return sourceBackendImport; }
+
+    public void setSourceBackendImport(String sourceBackendImport) { this.sourceBackendImport = sourceBackendImport; }
+
+    public enum GenericDataCollectionImportMethod {UPLOADED, JOB, BACKEND_IMPORT}
 	
 }

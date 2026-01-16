@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -60,6 +61,14 @@ public class GenericFileHandler {
         File genericFilesFolder = getFilesFolder(genericDataCollectionId);
         genericFilesFolder.getParentFile().mkdirs();
         Files.move(folder.toPath(), genericFilesFolder.toPath());
+        addAllInDb(genericDataCollectionId);
+    }
+
+    public void importFolderCopy(String genericDataCollectionId, File folder)
+            throws IOException {
+        File genericFilesFolder = getFilesFolder(genericDataCollectionId);
+        genericFilesFolder.getParentFile().mkdirs();
+        FileUtils.copyDirectory(folder, genericFilesFolder);
         addAllInDb(genericDataCollectionId);
     }
 
