@@ -12,6 +12,7 @@ import gov.nist.itl.ssd.wipp.backend.core.model.workflow.WorkflowRepository;
 import gov.nist.itl.ssd.wipp.backend.core.model.workflow.WorkflowStatus;
 import gov.nist.itl.ssd.wipp.backend.core.rest.exception.ClientException;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.rest.webmvc.PersistentEntityResourceAssembler;
@@ -67,6 +68,7 @@ public class WorkflowSubmitController {
         method = RequestMethod.POST,
         produces = { "application/hal+json" }
     )
+    @Tool(description = "Submits workflow")
     public EntityModel<Workflow> submit(
         @PathVariable("workflowId") String workflowId
     ) {

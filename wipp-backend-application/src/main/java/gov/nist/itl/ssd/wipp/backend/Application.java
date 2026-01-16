@@ -11,9 +11,13 @@
  */
 package gov.nist.itl.ssd.wipp.backend;
 
+import gov.nist.itl.ssd.wipp.backend.app.WippTools;
+import gov.nist.itl.ssd.wipp.backend.argo.workflows.workflow.WorkflowSubmitController;
 import gov.nist.itl.ssd.wipp.backend.core.CoreConfig;
 import gov.nist.itl.ssd.wipp.backend.core.model.data.DataHandlerFactory;
 import gov.nist.itl.ssd.wipp.backend.core.rest.annotation.IdExposed;
+import org.springframework.ai.tool.ToolCallbackProvider;
+import org.springframework.ai.tool.method.MethodToolCallbackProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ServiceLocatorFactoryBean;
@@ -58,6 +62,15 @@ public class Application implements WebMvcConfigurer {
         initSpring(ctx);
     }
 
+    @Bean
+    public ToolCallbackProvider workflowSubmitTools(WorkflowSubmitController workflowSubmitController) {
+        return MethodToolCallbackProvider.builder().toolObjects(workflowSubmitController).build();
+    }
+
+    @Bean
+    public ToolCallbackProvider wippAssistantTools(WippTools wippTools) {
+        return MethodToolCallbackProvider.builder().toolObjects(wippTools).build();
+    }
 
     private static void initSpring(ConfigurableApplicationContext ctx) {
         RepositoryRestConfiguration restConf = ctx.getBean(
