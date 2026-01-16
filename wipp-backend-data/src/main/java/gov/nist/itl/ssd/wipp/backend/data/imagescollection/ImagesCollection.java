@@ -46,7 +46,8 @@ public class ImagesCollection extends Data {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private Date creationDate;
 
-    @Indexed(unique = true, sparse = true)
+    // TODO: db.imagesCollection.dropIndex("sourceJob"); due to updated index
+    @Indexed(sparse = true)
     @ManualRef(Job.class)
     private String sourceJob;
     
@@ -56,7 +57,7 @@ public class ImagesCollection extends Data {
 
     @ManualRef(ImageAnnotationsCollection.class)
     private String sourceAnnotationCollection;
-    
+
     private ImagesCollectionImportMethod importMethod;
 
     private ImagesCollectionFormat format;
