@@ -118,24 +118,26 @@ public class AiModelDataHandler extends BaseDataHandler implements DataHandler {
                 setAccuracy(type, id, mc);
                 setLoss(type, id, mc);
             }
-        } catch (IOException e) { throw new RuntimeException(e); }
+        } catch (IOException e) {
+            // Unable to import TensorBoard Logs, pass
+        }
 
         // Save
         modelCardRepository.save(mc);
 	}
 
     private void setFramework(Plugin plugin, AiModel aiModel) {
-        // search for output where "name" == "outputDir"
-        PluginIO outputDir = null;
+        // search for aiModel output
+        PluginIO outputAiModel = null;
         for (PluginIO output : plugin.getOutputs()) {
-            if(Objects.equals(output.getName(), "outputDir")) {
-                outputDir = output;
+            if(Objects.equals(output.getType(), "tensorflowModel")) {
+                outputAiModel = output;
             }
         }
         // get framework data from this output
-        if(outputDir!=null && outputDir.getOptions()!=null && !outputDir.getOptions().isEmpty() &&
-                outputDir.getOptions().get("framework")!=null) {
-            aiModel.setFramework(outputDir.getOptions().get("framework").toString());
+        if(outputAiModel!=null && outputAiModel.getOptions()!=null && !outputAiModel.getOptions().isEmpty() &&
+                outputAiModel.getOptions().get("framework")!=null) {
+            aiModel.setFramework(outputAiModel.getOptions().get("framework").toString());
         } else {
             aiModel.setFramework("N/A");
         }
