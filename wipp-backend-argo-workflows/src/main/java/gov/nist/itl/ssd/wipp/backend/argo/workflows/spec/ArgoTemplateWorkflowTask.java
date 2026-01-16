@@ -14,6 +14,8 @@ public class ArgoTemplateWorkflowTask {
 
     private Map<String, List<NameValueParam>> arguments;
 
+    private Map<String, ArgoLifecycleHook> hooks;
+
     public String getName() {
         return name;
     }
@@ -45,4 +47,8 @@ public class ArgoTemplateWorkflowTask {
     public void setArguments(Map<String, List<NameValueParam>> arguments) {
         this.arguments = arguments;
     }
+
+    public Map<String, ArgoLifecycleHook> getHooks() { return hooks; }
+
+    public void setHooks(Map<String, ArgoLifecycleHook> hooks) { this.hooks = hooks; }
 }

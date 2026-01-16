@@ -12,8 +12,6 @@
 package gov.nist.itl.ssd.wipp.backend.argo.workflows.workflow;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import gov.nist.itl.ssd.wipp.backend.core.model.computation.Plugin;
@@ -29,7 +27,6 @@ import gov.nist.itl.ssd.wipp.backend.core.model.job.Job;
 import gov.nist.itl.ssd.wipp.backend.core.model.workflow.Workflow;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -271,6 +268,8 @@ public class WorkflowConverter {
         argoTemplateWorkflowTask.setArguments(argoTemplateWorkflowParams);
 
         argoTemplateWorkflowTask.setDependencies(this.jobsDependencies.get(job));
+        // disabled for now
+        //(Map.of("starting", this.generateLifecycleHooks(job.getName())));
         return argoTemplateWorkflowTask;
     }
 
@@ -278,8 +277,11 @@ public class WorkflowConverter {
         ArgoTemplateExitHandler argoTemplateExitHandler = new ArgoTemplateExitHandler();
         argoTemplateExitHandler.setName("exit-handler");
 
-        argoTemplateExitHandler.setContainer(
-                this.generateTemplateExitHandlerContainer()
+//        argoTemplateExitHandler.setContainer(
+//                this.generateTemplateExitHandlerContainer()
+//        );
+        argoTemplateExitHandler.setHttp(
+                this.generateTemplateExitHandlerHttp()
         );
 
         return argoTemplateExitHandler;
@@ -310,6 +312,63 @@ public class WorkflowConverter {
 
         return container;
     }
+
+    private ArgoTemplateHttp generateTemplateExitHandlerHttp() {
+        ArgoTemplateHttp http = new ArgoTemplateHttp();
+
+        String url = coreConfig.getWorkflowNotificationsUrl() + "/api/workflows/" + workflow.getId() + "/exit";
+        http.setUrl(url);
+        http.setMethod("POST");
+        http.setBody("{{workflow.status}}");
+
+        return http;
+    }
+
+    private ArgoTemplateHttp generateTemplateLifecycleHookHttp() {
+        ArgoTemplateHttp http = new ArgoTemplateHttp();
+
+        String url = coreConfig.getWorkflowNotificationsUrl() + "/api/workflows/" + workflow.getId() + "/status-update/{{inputs.parameters.taskname}}";
+        http.setUrl(url);
+        http.setMethod("POST");
+        http.setBody("{{inputs.parameters.podname}}");
+
+        return http;
+    }
+
+    private ArgoTemplateLifecycleHook generateTemplateLifecycleHook() {
+        ArgoTemplateLifecycleHook argoTemplateLifecycleHook = new ArgoTemplateLifecycleHook();
+        argoTemplateLifecycleHook.setName("lifecycle-hook");
+
+        argoTemplateLifecycleHook.setHttp(
+                this.generateTemplateLifecycleHookHttp()
+        );
+
+        HashMap<String, List<NameValueParam>> hookTemplateInputs = new HashMap<>();
+        List<NameValueParam> hookTemplateArgs = new ArrayList<>();
+        hookTemplateArgs.add(new NameValueParam("taskname"));
+        hookTemplateArgs.add(new NameValueParam("podname"));
+        hookTemplateInputs.put("parameters", hookTemplateArgs);
+
+        argoTemplateLifecycleHook.setInputs(hookTemplateInputs);
+
+        return argoTemplateLifecycleHook;
+    }
+
+    private ArgoLifecycleHook generateLifecycleHooks(String taskName) {
+        ArgoLifecycleHook argoLifecycleHook = new ArgoLifecycleHook();
+        argoLifecycleHook.setExpression("tasks['" + taskName + "'].status == 'Pending'");
+        argoLifecycleHook.setTemplate("lifecycle-hook");
+        Map<String, List<NameValueParam>> params = new HashMap<>();
+        List<NameValueParam> args = new ArrayList<>();
+        args.add(new NameValueParam("podname", "{{=pod.name}}"));
+        args.add(new NameValueParam("taskname", taskName));
+        //argoLifecycleHook.setArguments(Map.of("podName", "'{{pod.name}}'", "id", "'{{tasks." + taskName + ".id}}'"));
+        params.put("parameters", args);
+        argoLifecycleHook.setArguments(params);
+
+        return argoLifecycleHook;
+    }
+
     /**
      * Get and parse nodeSelector labels for all jobs within workflow. 
      * Can be overridden by nodeSelector in container template.
@@ -382,6 +441,9 @@ public class WorkflowConverter {
 
         // Add exit handler template
         argoTemplates.add(this.generateTemplateExitHandler());
+
+        // Add lifecycle hook templates (disabled for now)
+        //argoTemplates.add(this.generateTemplateLifecycleHook());
 
         return argoTemplates;
     }
